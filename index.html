@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title></title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+      }
+
+      .frame {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="frame"></div>
+
+    <div class="container">
+      <h2>Currency calculator!</h2>
+      <div class="currency-amount">
+        <div class="currency-amount__wrapper">
+          <label for="amount-one">Amount</label>
+          <input
+            type="number"
+            id="amount-one"
+            value="15.00"
+            placeholder="EUR"
+          />
+        </div>
+      </div>
+
+      <div class="swap-rate">
+        <div id="rate"></div>
+      </div>
+
+      <div class="currency-amount">
+        <div class="currency-amount__wrapper">
+          <label for="currency-two">Currency</label>
+          <select id="currency-two">
+            <option value="USD">USD - USA dollar</option>
+            <option value="DKK">USD - Taani kroon</option>
+            <option value="GBP">USD - Suurbritannia nael</option>
+            <option value="JPY">JPY - Jaapani jeen</option>
+            <option value="NOK">NOK - Norra kroon</option>
+            <option value="SEK">SEK - Rootsi kroon</option>
+            <option value="HKD">HKD - Hongkongi dollar</option>
+          </select>
+        </div>
+      </div>
+      <div class="result">
+        <p id="amount-description"></p>
+        <p id="amount-two"></p>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      const container = document.querySelector(".container");
+      let myElement = document.querySelector(".frame");
+      let shadow = myElement.attachShadow({
+        mode: "open",
+      });
+
+      shadow.innerHTML = `
+        <style>
+
+          :root {
+            --green: #60cd18;
+            --blue: #007ac7;
+          }
+
+          * {
+            box-sizing: border-box;
+            margin: 0;
+          }
+
+          body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            height: 100vh;
+            padding: 20px;
+          }
+
+          h2 {
+            color: #007ac7;
+            margin-bottom: 1rem;
+            text-align: center;
+          }
+
+          p {
+            color: #60cd18;
+            font-weight: 600;
+            text-align: center;
+            margin: 14px 0 10px 0;
+          }
+          
+          .container {
+            max-width: 500px;
+            padding: 50px 15px;
+            border-radius: 8px;
+            background-color: rgb(255, 255, 255);
+            box-shadow: rgb(35 55 80 / 30%) 0px 6px 12px;
+            margin: 0 auto;
+          }
+
+          @media screen and (min-width: 768px) {
+            .container {
+              padding: 50px 100px;
+            }
+          }
+
+          .currency-amount {
+            margin: 20px 0;
+          }
+
+          .currency-amount label {
+            justify-self: start;
+            align-self: flex-start;
+            display: inline-block;
+            font-weight: 600;
+            color: rgb(20, 30, 55);
+            margin-bottom: 0.2rem;
+          }
+
+          .currency-amount select,
+          .currency-amount input {
+            width: 100%;
+            border: 1px solid rgb(221, 221, 221);
+            border-radius: 6px;
+            box-shadow: rgb(0 17 51 / 5%) 0px 3px 15px;
+            padding: 12px;
+            cursor: pointer;
+          }
+
+          .currency-amount select:focus,
+          .currency-amount input:focus {
+            outline: 0;
+          }
+
+          .swap-rate #rate {
+            color: #60cd18;
+            text-align: right;
+            font-weight: 600;
+            font-size: 11px;
+            border: solid 1px #60cd18;
+            padding: 9px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            text-align: center;
+          }
+
+          .result {
+            font-size: 3rem;
+            font-weight: 600;
+            color: rgb(46, 60, 87);
+            margin-bottom: 24px;
+          }
+
+          .result #amount-description {
+            color: rgb(92, 102, 123);
+            font-weight: 600;
+            margin: 0px;
+            font-size: 1.6rem;
+          }
+        </style>
+`;
+      shadow.appendChild(container);
+
+      const currencyTwo = shadow.getElementById("currency-two");
+      const amountOne = shadow.getElementById("amount-one");
+      const amountTwo = shadow.getElementById("amount-two");
+      const rate = shadow.getElementById("rate");
+      const amountEUR = shadow.getElementById("amount-description");
+
+      // all currency rates are given in relation to EUR
+      const conversionRates = [
+        {
+          USD: 1.0674,
+          DKK: 7.4393,
+          GBP: 0.84135,
+          JPY: 136.15,
+          NOK: 9.7943,
+          SEK: 10.3935,
+          HKD: 8.586,
+        },
+      ];
+
+      const calculateRate = () => {
+        let currencyOneValue = "EUR";
+        let currencyTwovalue = currencyTwo.value;
+
+        // console.log(conversionRates[0]);
+        const fetchedRate = conversionRates[0][currencyTwovalue];
+        rate.innerHTML = `1 ${currencyOneValue} = ${fetchedRate} ${currencyTwovalue}`;
+        amountEUR.innerHTML = `${amountOne.value} Euros = `;
+        amountTwo.innerHTML = `${(amountOne.value * fetchedRate).toFixed(2)} ${currencyTwovalue}`;
+      };
+
+      // Event listeners
+      currencyTwo.addEventListener("change", calculateRate);
+      amountOne.addEventListener("input", calculateRate);
+      amountTwo.addEventListener("input", calculateRate);
+
+      calculateRate();
+    });
+
+    /*
+  1. Using a normal HTML element, but attaching a Shadoe DOM
+*/
+
+    /*
+  2. Using a custom element
+*/
+    class AnotherElement extends HTMLElement {
+      constructor() {
+        super();
+      }
+    }
+  </script>
+</html>
